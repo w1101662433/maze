@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<body>
+<canvas id="myCanvas" width="800" height="800" style="border:5px solid #d3d3d3;"></canvas>
+
+<script src="maze_map.js"></script>
+<script src="player.js"></script>
+<script>
+    const ctx = document.getElementById("myCanvas").getContext("2d");
+    let maze_map = generate_maze();
+    let player = generate_player();
+
+    function draw_map(maze_map) {
+        for (let x in maze_map) {
+            for (let y in maze_map[x]) {
+                let this_block = maze_map[x][y];
+                if (this_block.left_border.show === 1) {
+                    ctx.moveTo(...this_block.left_border.start_point);
+                    ctx.lineTo(...this_block.left_border.end_point);
+                }
+                if (this_block.right_border.show === 1) {
+                    ctx.moveTo(...this_block.right_border.start_point);
+                    ctx.lineTo(...this_block.right_border.end_point);
+                }
+                if (this_block.top_border.show === 1) {
+                    ctx.moveTo(...this_block.top_border.start_point);
+                    ctx.lineTo(...this_block.top_border.end_point);
+                }
+                if (this_block.bottom_border.show === 1) {
+                    ctx.moveTo(...this_block.bottom_border.start_point);
+                    ctx.lineTo(...this_block.bottom_border.end_point);
+                }
+            }
+        }
+        ctx.stroke();   //画图
+    }
+
+    function draw_player(player) {
+        [x, y] = player.site;
+        ctx.fillStyle = "#FF0000";
+        ctx.beginPath();
+        ctx.arc((x + 0.5) * borderLength, (y + 0.5) * borderLength, borderLength / 4, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill()
+    }
+
+    function clean_player(player) {
+        [x, y] = player.site;
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath();
+        ctx.arc((x + 0.5) * borderLength, (y + 0.5) * borderLength, borderLength / 4, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.fill()
+    }
+
+
+    draw_map(maze_map);
+    draw_player(player);
+
+    document.onkeydown = function (event) {
+        let e = event || window.event || arguments.callee.caller.arguments[0];
+        [x, y] = player.site;
+        if (e && e.keyCode === 37) { // 按 left
+            if (maze_map[x][y].left_border.show === 1) return;
+            clean_player(player);
+            player.move('left')
+        }
+        if (e && e.keyCode === 39) { // 按 right
+            if (maze_map[x][y].right_border.show === 1) return;
+            clean_player(player);
+            player.move('right')
+        }
+        if (e && e.keyCode === 38) { // top
+            if (maze_map[x][y].top_border.show === 1) return;
+            clean_player(player);
+            player.move('top')
+        }
+        if (e && e.keyCode === 40) { // bottom
+            if (maze_map[x][y].bottom_border.show === 1) return;
+            clean_player(player);
+            player.move('bottom')
+        }
+
+        draw_player(player);
+        [x, y] = player.site;
+        if (x === mazeWidth - 1 && y === mazeWidth - 1) {
+            alert('you win')
+        }
+    }
+
+</script>
+</body>
+</html>
